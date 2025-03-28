@@ -54,7 +54,8 @@ class UserInfo(Base):
     user_age = Column(DATETIME, nullable=False)
 
     # 权限，不允许为空
-    authority =Column(INTEGER, nullable=False)
+    authority = Column(INTEGER, nullable=False)
+
 
 class ArticleInfo(Base):
     # 文章信息表
@@ -63,8 +64,8 @@ class ArticleInfo(Base):
     # 用户名，主键，外键，不允许为空
     user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
 
-    # 头像(存储图片名)，外键，不允许为空
-    icon = Column(VARCHAR(20), ForeignKey("user_info.icon"), nullable=False)
+    # 头像(存储图片名)，不允许为空
+    icon = Column(VARCHAR(20), nullable=False)
 
     # 文章名，不允许为空
     article_name = Column(VARCHAR(20), nullable=False)
@@ -89,8 +90,8 @@ class CommentInfo(Base):
     # 用户名，主键，外键，不允许为空
     user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
 
-    # 头像(存储图片名)，外键，不允许为空
-    icon = Column(VARCHAR(20), ForeignKey("user_info.icon"), nullable=False)
+    # 头像(存储图片名)，不允许为空
+    icon = Column(VARCHAR(20), nullable=False)
 
     # 评论名，不允许为空
     comment_name = Column(VARCHAR(20), nullable=False)
@@ -131,22 +132,20 @@ class ManageData(Base):
     run_date = Column(DATETIME, nullable=False)
 
 
-# from const import Mysql_addr, Mysql_user, Mysql_pass, Mysql_db
-#
-# link = "mysql+pymysql://{}:{}@{}/{}".format(
-#     Mysql_user, Mysql_pass, Mysql_addr, Mysql_db)
-#
-#
-# def init_db():
-#     engine = create_engine(
-#         link,
-#         encoding="utf-8",
-#         echo=True
-#     )
-#     Base.metadata.create_all(engine)
-#
-#
-# if __name__ == "__main__":
-#     init_db()
-#
+from const import Mysql_addr, Mysql_user, Mysql_pass, Mysql_db
 
+link = "mysql+pymysql://{}:{}@{}/{}".format(
+    Mysql_user, Mysql_pass, Mysql_addr, Mysql_db)
+
+
+def init_db():
+    engine = create_engine(
+        link,
+        echo=True,
+        pool_pre_ping=True
+    )
+    Base.metadata.create_all(engine)
+
+
+if __name__ == "__main__":
+    init_db()
