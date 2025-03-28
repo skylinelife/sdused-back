@@ -53,6 +53,8 @@ class UserInfo(Base):
     # 用户使用时间(可以没有)，不允许为空
     user_age = Column(DATETIME, nullable=False)
 
+    # 权限，不允许为空
+    authority =Column(INTEGER, nullable=False)
 
 class ArticleInfo(Base):
     # 文章信息表
@@ -110,7 +112,7 @@ class ManageData(Base):
     # 管理数据表
     __tablename__ = 'manage_data'
 
-    # 管理员名
+    # 管理员名，主键
     admin_name = Column(VARCHAR(20), primary_key=True, nullable=False)
 
     # 用户数，不允许为空
