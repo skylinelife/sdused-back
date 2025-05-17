@@ -1,7 +1,7 @@
 import copy
 import json
 
-from sqlalchemy import Column, ForeignKey, Index, UniqueConstraint
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, DATETIME, LONGTEXT, \
@@ -50,8 +50,8 @@ class UserInfo(Base):
     # 被评论数量(用作回复提醒)，不允许为空
     commented_count = Column(INTEGER, nullable=False)
 
-    # 用户使用时间(可以没有)，不允许为空
-    user_age = Column(DATETIME, nullable=False)
+    # 用户使用时间(可以没有)
+    user_age = Column(DATETIME, nullable=True)
 
     # 权限，不允许为空
     authority = Column(INTEGER, nullable=False)
@@ -61,8 +61,11 @@ class ArticleInfo(Base):
     # 文章信息表
     __tablename__ = 'article_info'
 
-    # 用户名，主键，外键，不允许为空
-    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
+    # 文章id，主键，自增，不允许为空
+    article_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
+
+    # 用户名，外键，不允许为空
+    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)，不允许为空
     icon = Column(VARCHAR(20), nullable=False)
@@ -145,6 +148,84 @@ def init_db():
         pool_pre_ping=True
     )
     Base.metadata.create_all(engine)
+
+
+class dbSession:
+    session = None
+
+    def __init__(self):
+        engine = create_engine(
+            link,
+            encoding="utf-8"
+        )
+        DBSession = sessionmaker(bind=engine)
+        self.session = DBSession()
+
+    def getSession(self):
+        return self.session
+
+    def jsonDumps(self, data, keys):
+        for key in keys:
+            if key in data and data[key] is not None:
+                data[key] = json.dumps(data[key])
+        return data
+
+    def jsonLoads(self, data, keys):
+        for key in keys:
+            if key in data and data[key] is not None:
+                data[key] = json.loads(data[key])
+        return data
+
+    # 待处理的查出数据，要转换的时间数据，要删除的数据
+    def dealData(self, data, timeKeys=None, popKeys=None):
+        from utilsTime import getMsTime
+        dict_: dict = copy.deepcopy(data.__dict__)
+        dict_.pop("_sa_instance_state")
+        if popKeys is not None:
+            for key in popKeys:
+                if key in dict_:
+                    dict_.pop(key)
+        if timeKeys is not None:
+            for key in timeKeys:
+                if key in dict_ and dict_[key] is not None:
+                    dict_[key] = getMsTime(dict_[key])
+        return dict_
+
+    def dealDataToy(self, data, timeKeys=None, saveKeys=None):
+        from utilsTime import getMsTime
+        dict_: dict = copy.deepcopy(data.__dict__)
+        dict_.pop("_sa_instance_state")
+        if saveKeys is not None:
+            ls = []
+            for key in dict_:
+                if key not in saveKeys:
+                    ls.append(key)
+            for x in ls:
+                dict_.pop(x)
+        if timeKeys is not None:
+            for key in timeKeys:
+                if key in dict_ and dict_[key] is not None:
+                    dict_[key] = getMsTime(dict_[key])
+        return dict_
+
+    def deleteNone(self, data):
+        if type(data) == list:
+            for i in range(len(data)):
+                data[i] = self.deleteNone(data[i])
+        elif type(data) == dict:
+            data = {key: value for key, value in data.items() if
+                    value is not None}
+
+        return data
+
+    def dealDataList(self, data, timeKeys=None, popKeys=None):
+        dicts = []
+        for d in data:
+            dicts.append(self.dealData(d, timeKeys, popKeys))
+        return dicts
+
+    def __del__(self):
+        self.session.close()
 
 
 if __name__ == "__main__":
