@@ -7,12 +7,17 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from server import answer_sheet
+from server import admin, article_management, comment, get_image, home, upload, user_setting
 from utilsTime import getMsTime
 
 app = FastAPI()
-app.include_router(objective.router)
-app.include_router(answer_sheet.router)
+app.include_router(admin.router)
+# app.include_router(article_management.router)
+# app.include_router(comment.router)
+# app.include_router(get_image.router)
+# app.include_router(home.router)
+# app.include_router(upload.router)
+# app.include_router(user_setting.router)
 
 
 origins = [
@@ -39,7 +44,7 @@ async def http_exception_handle(request, exc):
 
 
 @app.exception_handler(RequestValidationError)
-async def request_validatoion_error(request, exc):
+async def request_validation_error(request, exc):
     try:
         message = str(exc.detail)
     except:
@@ -57,7 +62,7 @@ async def request_validatoion_error(request, exc):
 
 
 @app.exception_handler(Exception)
-async def request_validatoion_error(request, exc):
+async def request_validation_error(request, exc):
     if str(exc) == "未登录":
         response = JSONResponse({
             "code": 403,
