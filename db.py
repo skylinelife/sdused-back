@@ -38,8 +38,8 @@ class UserInfo(Base):
     # 邮箱，不允许为空
     email = Column(VARCHAR(20), nullable=False)
 
-    # 头像(存储图片名)，不允许为空
-    icon = Column(VARCHAR(20), nullable=False)
+    # 头像(存储图片名)
+    icon = Column(VARCHAR(20))
 
     # 文章数量，不允许为空
     article_num = Column(VARCHAR(10), nullable=False)
@@ -67,11 +67,11 @@ class ArticleInfo(Base):
     # 用户名，外键，不允许为空
     user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), nullable=False)
 
-    # 头像(存储图片名)，不允许为空
-    icon = Column(VARCHAR(20), nullable=False)
+    # 头像(存储图片名)
+    icon = Column(VARCHAR(20))
 
-    # 文章名，不允许为空
-    article_name = Column(VARCHAR(20), nullable=False)
+    # 文章名，唯一，不允许为空
+    article_name = Column(VARCHAR(20), nullable=False, unique=True)
 
     # 图片，存储多个图片路径，可以为空
     picture = Column(VARCHAR(200))
@@ -90,16 +90,19 @@ class CommentInfo(Base):
     # 评论信息表
     __tablename__ = 'comment_info'
 
-    # 用户名，主键，外键，不允许为空
-    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
+    # 评论id，主键，自增，不允许为空
+    comment_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
 
-    # 头像(存储图片名)，不允许为空
-    icon = Column(VARCHAR(20), nullable=False)
+    # 用户名，外键，不允许为空
+    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), nullable=False)
 
-    # 评论名，不允许为空
-    comment_name = Column(VARCHAR(20), nullable=False)
+    # 头像(存储图片名)
+    icon = Column(VARCHAR(20))
 
-    # 图片，存储多个图片路径，可以为空
+    # 评论的文章名，外键，不允许为空
+    article_name = Column(VARCHAR(20), ForeignKey("article_info.article_name"), nullable=False)
+
+    # 图片，存储多个图片路径
     picture = Column(VARCHAR(200))
 
     # 评论内容， 不允许为空
@@ -122,8 +125,8 @@ class ManageData(Base):
     # 用户数，不允许为空
     user_num = Column(VARCHAR(20), nullable=False)
 
-    # 头像数据，不允许为空
-    icon_data = Column(VARCHAR(20), nullable=False)
+    # 头像数据
+    icon_data = Column(VARCHAR(20))
 
     # 评论数，不允许为空
     comment_num = Column(VARCHAR(20), nullable=False)
