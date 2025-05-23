@@ -12,7 +12,7 @@ from utilsTime import getMsTime
 
 app = FastAPI()
 app.include_router(admin.router)
-# app.include_router(article_management.router)
+app.include_router(article_management.router)
 # app.include_router(comment.router)
 # app.include_router(get_image.router)
 # app.include_router(home.router)
