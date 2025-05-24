@@ -16,3 +16,15 @@ class createArticleType(BaseModel):
     picture: str = None
 
 
+class updateArticleType(BaseModel):
+    # 修改文章
+    article_name: str
+    article_content: str
+    icon: str = None
+    picture: str = None
+
+
+class getArticleListType(BaseModel):
+    # 获取文章
+    pageNow: int = 1
+    pageSize: int = 10

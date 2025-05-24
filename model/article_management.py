@@ -4,7 +4,7 @@ from fastapi import Response
 from starlette.responses import StreamingResponse
 
 from db import dbSession, SignInInfo, UserInfo, ArticleInfo
-from ser.article_management import createArticleType
+from ser.article_management import createArticleType, updateArticleType, getArticleListType
 
 
 # 文章管理操作类
@@ -29,5 +29,105 @@ class articleManagementModel(dbSession):
         except Exception as e:
             self.session.rollback()
             raise HTTPException(status_code=500, detail=f"文章发布失败: {str(e)}")
+
+    # 修改文章内容
+    def updateArticle(self, aid: int, data: updateArticleType):
+        # 可以修改文章名，文章内容
+        try:
+            article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
+            if not article:
+                raise HTTPException(status_code=404, detail="文章不存在")
+            article.article_name = data.article_name
+            article.article_content = data.article_content
+            article.picture = data.picture
+            self.session.commit()
+            return {"msg": "文章修改成功"}
+        except Exception as e:
+            self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"文章修改失败: {str(e)}")
+
+    # 删除文章
+    def deleteArticle(self, aid: int):
+        try:
+            article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
+            if not article:
+                raise HTTPException(status_code=404, detail="文章不存在")
+            self.session.delete(article)
+            self.session.commit()
+            return {"msg": "文章删除成功"}
+        except Exception as e:
+            self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"文章删除失败: {str(e)}")
+
+    # 获取文章详情
+    def getArticleDetail(self, aid: int):
+        try:
+            article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
+            if not article:
+                raise HTTPException(status_code=404, detail="文章不存在")
+            return {
+                "user_name": article.user_name,
+                "article_name": article.article_name,
+                "article_content": article.article_content,
+                "icon": article.icon,
+                "picture": article.picture,
+                "useful_num": article.useful_num,
+                "publish_date": article.publish_date
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取文章详情失败: {str(e)}")
+
+    # 获取所有文章列表（支持分页）
+    def getArticleList(self, data: getArticleListType):
+        try:
+            articles = self.session.query(ArticleInfo).offset((data.pageNow - 1) * data.pageSize).limit(data.pageSize).all()
+            total = self.session.query(ArticleInfo).count()
+            return {
+                "total": total,
+                "articles": [
+                    {
+                        "article_id": article.article_id,
+                        "user_name": article.user_name,
+                        "article_name": article.article_name,
+                        "icon": article.icon,
+                        "picture": article.picture,
+                        "useful_num": article.useful_num,
+                        "publish_date": article.publish_date
+                    } for article in articles
+                ]
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取文章列表失败: {str(e)}")
+
+    # 获取当前用户的所有文章
+    def getMyArticles(self, user_name: str):
+        try:
+            articles = self.session.query(ArticleInfo).filter(ArticleInfo.user_name == user_name).all()
+            return [
+                {
+                    "article_id": article.article_id,
+                    "article_name": article.article_name,
+                    "icon": article.icon,
+                    "picture": article.picture,
+                    "useful_num": article.useful_num,
+                    "publish_date": article.publish_date
+                } for article in articles
+            ]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取用户文章失败: {str(e)}")
+
+    # 点赞某篇文章
+    def likeArticle(self, aid: int):
+        try:
+            article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
+            if not article:
+                raise HTTPException(status_code=404, detail="文章不存在")
+            article.useful_num += 1
+            self.session.commit()
+            return {"msg": "点赞成功"}
+        except Exception as e:
+            self.session.rollback()
+            raise HTTPException(status_code=500, detail=f"点赞失败: {str(e)}")
+
 
 
