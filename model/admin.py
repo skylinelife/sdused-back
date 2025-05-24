@@ -34,7 +34,7 @@ class adminModel(dbSession):
             return HTTPException(status_code=404, detail="Permission Denial")
 
     # 删除对应文章
-    def deleteArticle(self, aid):
+    def deleteArticle(self, aid: int):
         # 删除对应文章
         query = self.session.query(ArticleInfo).filter(
             ArticleInfo.article_id == aid
@@ -43,3 +43,15 @@ class adminModel(dbSession):
             self.session.delete(obj)
             self.session.flush()
             self.session.commit()
+
+    # 获取站点运行统计信息
+    def getStatistics(self):
+        from db import ManageData
+        data = self.session.query(ManageData).all()
+        result = []
+        for item in data:
+            dict_item = self.deleteNone(item.__dict__)
+            dict_item.pop('_sa_instance_state', None)
+            result.append(dict_item)
+        return result
+
