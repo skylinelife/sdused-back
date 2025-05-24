@@ -42,10 +42,10 @@ class UserInfo(Base):
     icon = Column(VARCHAR(20))
 
     # 文章数量，不允许为空
-    article_num = Column(VARCHAR(10), nullable=False)
+    article_num = Column(INTEGER, nullable=False)
 
     # 评论数量，不允许为空
-    comment_num = Column(VARCHAR(10), nullable=False)
+    comment_num = Column(INTEGER, nullable=False)
 
     # 被评论数量(用作回复提醒)，不允许为空
     commented_count = Column(INTEGER, nullable=False)
@@ -99,8 +99,8 @@ class CommentInfo(Base):
     # 头像(存储图片名)
     icon = Column(VARCHAR(20))
 
-    # 评论的文章名，外键，不允许为空
-    article_name = Column(VARCHAR(20), ForeignKey("article_info.article_name"), nullable=False)
+    # 评论的文章id，外键，不允许为空
+    article_id = Column(INTEGER, ForeignKey("article_info.article_id"), nullable=False)
 
     # 图片，存储多个图片路径
     picture = Column(VARCHAR(200))
@@ -109,7 +109,7 @@ class CommentInfo(Base):
     comment_content = Column(VARCHAR(500), nullable=False)
 
     # 被点赞数量，不为空
-    useful_num = Column(VARCHAR(10), nullable=False)
+    useful_num = Column(INTEGER, nullable=False)
 
     # 发布日期，不为空
     publish_date = Column(DATETIME, nullable=False)
@@ -123,16 +123,16 @@ class ManageData(Base):
     admin_name = Column(VARCHAR(20), primary_key=True, nullable=False)
 
     # 用户数，不允许为空
-    user_num = Column(VARCHAR(20), nullable=False)
+    user_num = Column(INTEGER, nullable=False)
 
     # 头像数据
     icon_data = Column(VARCHAR(20))
 
     # 评论数，不允许为空
-    comment_num = Column(VARCHAR(20), nullable=False)
+    comment_num = Column(INTEGER, nullable=False)
 
     # 文章数，不允许为空
-    article_num = Column(VARCHAR(20), nullable=False)
+    article_num = Column(INTEGER, nullable=False)
 
     # 运行日期，不允许为空
     run_date = Column(DATETIME, nullable=False)
