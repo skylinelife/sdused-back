@@ -1,0 +1,114 @@
+from fastapi import HTTPException, UploadFile
+from fastapi import Response
+# from sqlalchemy import and_, func, delete
+from starlette.responses import StreamingResponse
+
+from db import dbSession, UserInfo, SignInInfo
+from ser.user_setting import userRegisterType, loginType, setPasswordType, updateUserType
+
+
+# 用户账户设置
+class userSettingModel(dbSession):
+
+    # 用户注册
+    def registerUser(self, data: userRegisterType):
+        user = UserInfo(
+            user_name=data.user_name,
+            sex=data.sex,
+            email=data.email,
+            icon=data.icon,
+            article_num=data.article_num,
+            comment_num=data.comment_num,
+            commented_count=data.commented_count,
+            user_age=data.user_age,
+            authority=data.authority
+        )
+        signin = SignInInfo(
+            user_name=data.user_name,
+            account_number=data.account_number,
+            password=data.password
+        )
+        self.session.add(user)
+        self.session.add(signin)
+        self.session.commit()
+        return {"message": "User registered successfully."}
+
+    # 删除用户
+    def deleteUser(self, user_id: int):
+        user = self.session.query(UserInfo).filter(UserInfo.user_id == user_id).first()
+        if user:
+            self.session.delete(user)
+            self.session.commit()
+            return {"message": "User deleted successfully."}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+
+    # 用户登录
+    def loginUser(self, data: loginType):
+        user = self.session.query(SignInInfo).filter(
+            SignInInfo.account_number == data.account_number,
+            SignInInfo.password == data.password
+        ).first()
+        if user:
+            return {"message": "Login successful", "user_name": user.user_name}
+        else:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # 用户退出登录
+    def logoutUser(self, user_name: str):
+        # 这里可以添加一些逻辑，比如清除用户会话等
+        return {"message": f"{user_name} logged out successfully."}
+
+    # 修改用户密码
+    def setPassword(self, data: setPasswordType):
+        user = self.session.query(SignInInfo).filter(
+            SignInInfo.account_number == data.account_number
+        ).first()
+        if user:
+            user.password = data.password
+            self.session.commit()
+            return {"message": "Password updated successfully."}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+
+    # 获取用户信息
+    def getUserInfo(self, user_name: str):
+        from db import UserInfo
+        user = self.session.query(UserInfo).filter(UserInfo.user_name == user_name).first()
+        if user:
+            return {
+                "user_name": user.user_name,
+                "sex": user.sex,
+                "email": user.email,
+                "icon": user.icon,
+                "article_num": user.article_num,
+                "comment_num": user.comment_num,
+                "commented_count": user.commented_count,
+            }
+
+    # 更新用户信息
+    def updateUserInfo(self, data: updateUserType):
+        user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
+        signin = self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).first()
+        if user and signin:
+            u_user = {
+                "user_name": data.user_name,
+                "sex": data.sex,
+                "email": data.email,
+                "icon": data.icon,
+                "user_age": data.user_age
+            }
+            u_signin = {
+                "user_name": data.user_name,
+                "account_number": data.account_number,
+                "password": data.password
+            }
+            self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).update(u_user)
+            self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).update(u_signin)
+            self.session.commit()
+            return {"message": "User updated successfully."}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+
+
+
