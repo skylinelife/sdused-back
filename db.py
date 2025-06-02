@@ -16,13 +16,10 @@ class SignInInfo(Base):
     __tablename__ = 'sign_in_info'
 
     # 用户名，主键，不允许为空
-    user_name = Column(VARCHAR(20), primary_key=True, nullable=False)
-
-    # 账号，主键，不允许为空
-    account_number = Column(VARCHAR(20), primary_key=True, nullable=False)
+    user_name = Column(VARCHAR(100), primary_key=True, nullable=False)
 
     # 密码，不允许为空
-    password = Column(VARCHAR(20), nullable=False)
+    password = Column(VARCHAR(200), nullable=False)
 
 
 class UserInfo(Base):
@@ -30,16 +27,16 @@ class UserInfo(Base):
     __tablename__ = 'user_info'
 
     # 用户名，主键，外键，不允许为空
-    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
+    user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), primary_key=True, nullable=False)
 
     # 性别，不允许为空
     sex = Column(VARCHAR(10), nullable=False)
 
     # 邮箱，不允许为空
-    email = Column(VARCHAR(20), nullable=False)
+    email = Column(VARCHAR(100), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(20))
+    icon = Column(VARCHAR(100))
 
     # 文章数量，不允许为空
     article_num = Column(INTEGER, nullable=False)
@@ -65,19 +62,19 @@ class ArticleInfo(Base):
     article_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
 
     # 用户名，外键，不允许为空
-    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), nullable=False)
+    user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(20))
+    icon = Column(VARCHAR(100))
 
     # 文章名，唯一，不允许为空
-    article_name = Column(VARCHAR(20), nullable=False, unique=True)
+    article_name = Column(VARCHAR(100), nullable=False, unique=True)
 
     # 图片，存储多个图片路径，可以为空
     picture = Column(VARCHAR(200))
 
     # 文章内容，不允许为空
-    article_content = Column(VARCHAR(1000), nullable=False)
+    article_content = Column(LONGTEXT, nullable=False)
 
     # 被点赞数量，不为空
     useful_num = Column(INTEGER, nullable=False)
@@ -94,10 +91,10 @@ class CommentInfo(Base):
     comment_id = Column(INTEGER, primary_key=True, autoincrement=True, nullable=False)
 
     # 用户名，外键，不允许为空
-    user_name = Column(VARCHAR(20), ForeignKey("sign_in_info.user_name"), nullable=False)
+    user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(20))
+    icon = Column(VARCHAR(200))
 
     # 评论的文章id，外键，不允许为空
     article_id = Column(INTEGER, ForeignKey("article_info.article_id"), nullable=False)
@@ -106,7 +103,7 @@ class CommentInfo(Base):
     picture = Column(VARCHAR(200))
 
     # 评论内容， 不允许为空
-    comment_content = Column(VARCHAR(500), nullable=False)
+    comment_content = Column(LONGTEXT, nullable=False)
 
     # 被点赞数量，不为空
     useful_num = Column(INTEGER, nullable=False)
@@ -120,13 +117,13 @@ class ManageData(Base):
     __tablename__ = 'manage_data'
 
     # 管理员名，主键
-    admin_name = Column(VARCHAR(20), primary_key=True, nullable=False)
+    admin_name = Column(VARCHAR(100), primary_key=True, nullable=False)
 
     # 用户数，不允许为空
     user_num = Column(INTEGER, nullable=False)
 
     # 头像数据
-    icon_data = Column(VARCHAR(20))
+    icon_data = Column(VARCHAR(200))
 
     # 评论数，不允许为空
     comment_num = Column(INTEGER, nullable=False)
