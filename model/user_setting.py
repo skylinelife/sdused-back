@@ -12,6 +12,10 @@ class userSettingModel(dbSession):
 
     # 用户注册
     def registerUser(self, data: userRegisterType):
+        # 检查用户名是否已存在
+        existing_user = self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already exists.")
         from datetime import datetime
         user = UserInfo(
             user_name=data.user_name,
@@ -87,6 +91,7 @@ class userSettingModel(dbSession):
         user = self.session.query(UserInfo).filter(UserInfo.user_name == user_name).first()
         if user:
             return {
+                "message": "Get user info successfully.",
                 "user_name": user.user_name,
                 "sex": user.sex,
                 "email": user.email,
@@ -95,6 +100,8 @@ class userSettingModel(dbSession):
                 "comment_num": user.comment_num,
                 "commented_count": user.commented_count,
             }
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
 
     # 更新用户信息
     def updateUserInfo(self, data: updateUserType):
@@ -116,6 +123,13 @@ class userSettingModel(dbSession):
             self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).update(u_user)
             self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).update(u_signin)
             self.session.commit()
-            return {"message": "User updated successfully."}
+            return \
+                {
+                    "message": "User updated successfully.",
+                    "user_name": data.user_name,
+                    "email": data.email,
+                    "password": data.password,
+                    "sex": data.sex
+                }
         else:
             raise HTTPException(status_code=404, detail="User not found")

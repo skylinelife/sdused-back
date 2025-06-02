@@ -13,8 +13,8 @@ router = APIRouter(
 @router.post("/register")
 async def register_user(data: userRegisterType):
     db = userSettingModel()
-    db.registerUser(data)
-    return makeResponse(None)
+    res = db.registerUser(data)
+    return res
 
 
 # 用户登录
