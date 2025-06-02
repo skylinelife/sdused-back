@@ -12,6 +12,7 @@ class userSettingModel(dbSession):
 
     # 用户注册
     def registerUser(self, data: userRegisterType):
+        from datetime import datetime
         user = UserInfo(
             user_name=data.user_name,
             sex=data.sex,
@@ -20,12 +21,11 @@ class userSettingModel(dbSession):
             article_num=data.article_num,
             comment_num=data.comment_num,
             commented_count=data.commented_count,
-            user_age=data.user_age,
+            user_age=datetime.now(),
             authority=data.authority
         )
         signin = SignInInfo(
             user_name=data.user_name,
-            account_number=data.account_number,
             password=data.password
         )
         self.session.add(user)
@@ -46,11 +46,21 @@ class userSettingModel(dbSession):
     # 用户登录
     def loginUser(self, data: loginType):
         user = self.session.query(SignInInfo).filter(
-            SignInInfo.account_number == data.account_number,
+            SignInInfo.user_name == data.user_name,
             SignInInfo.password == data.password
         ).first()
         if user:
-            return {"message": "Login successful", "user_name": user.user_name}
+            from db import UserInfo
+            data = self.session.query(UserInfo).filter(UserInfo.user_name == user.user_name).first()
+            return \
+                {
+                    "message": "Login successful",
+                    "user_name": data.user_name,
+                    "article_num": data.article_num,
+                    "comment_num": data.comment_num,
+                    "commented_count": data.commented_count,
+                    "authority": data.authority
+                }
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
@@ -62,7 +72,7 @@ class userSettingModel(dbSession):
     # 修改用户密码
     def setPassword(self, data: setPasswordType):
         user = self.session.query(SignInInfo).filter(
-            SignInInfo.account_number == data.account_number
+            SignInInfo.user_name == data.user_name
         ).first()
         if user:
             user.password = data.password
@@ -88,6 +98,7 @@ class userSettingModel(dbSession):
 
     # 更新用户信息
     def updateUserInfo(self, data: updateUserType):
+        from datetime import datetime
         user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
         signin = self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).first()
         if user and signin:
@@ -96,11 +107,10 @@ class userSettingModel(dbSession):
                 "sex": data.sex,
                 "email": data.email,
                 "icon": data.icon,
-                "user_age": data.user_age
+                "user_age": datetime.now()  # 更新用户使用时间为当前时间
             }
             u_signin = {
                 "user_name": data.user_name,
-                "account_number": data.account_number,
                 "password": data.password
             }
             self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).update(u_user)
@@ -109,6 +119,3 @@ class userSettingModel(dbSession):
             return {"message": "User updated successfully."}
         else:
             raise HTTPException(status_code=404, detail="User not found")
-
-
-

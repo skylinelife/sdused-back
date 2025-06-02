@@ -36,7 +36,7 @@ class UserInfo(Base):
     email = Column(VARCHAR(100), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(100))
+    icon = Column(VARCHAR(1000))
 
     # 文章数量，不允许为空
     article_num = Column(INTEGER, nullable=False)
@@ -65,13 +65,13 @@ class ArticleInfo(Base):
     user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(100))
+    icon = Column(VARCHAR(1000))
 
     # 文章名，唯一，不允许为空
     article_name = Column(VARCHAR(100), nullable=False, unique=True)
 
     # 图片，存储多个图片路径，可以为空
-    picture = Column(VARCHAR(200))
+    picture = Column(VARCHAR(1000))
 
     # 文章内容，不允许为空
     article_content = Column(LONGTEXT, nullable=False)
@@ -94,13 +94,13 @@ class CommentInfo(Base):
     user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(200))
+    icon = Column(VARCHAR(1000))
 
     # 评论的文章id，外键，不允许为空
     article_id = Column(INTEGER, ForeignKey("article_info.article_id"), nullable=False)
 
     # 图片，存储多个图片路径
-    picture = Column(VARCHAR(200))
+    picture = Column(VARCHAR(1000))
 
     # 评论内容， 不允许为空
     comment_content = Column(LONGTEXT, nullable=False)
@@ -123,7 +123,7 @@ class ManageData(Base):
     user_num = Column(INTEGER, nullable=False)
 
     # 头像数据
-    icon_data = Column(VARCHAR(200))
+    icon_data = Column(VARCHAR(1000))
 
     # 评论数，不允许为空
     comment_num = Column(INTEGER, nullable=False)
