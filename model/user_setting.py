@@ -99,6 +99,8 @@ class userSettingModel(dbSession):
                 "article_num": user.article_num,
                 "comment_num": user.comment_num,
                 "commented_count": user.commented_count,
+                "user_age": user.user_age,
+                "authority": user.authority
             }
         else:
             raise HTTPException(status_code=404, detail="User not found")

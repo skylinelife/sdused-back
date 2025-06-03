@@ -46,7 +46,7 @@ async def set_password(data: setPasswordType):
 async def get_user_info(user_name: str):
     db = userSettingModel()
     res = db.getUserInfo(user_name)
-    return makeResponse(res)
+    return res
 
 
 # 更新用户信息
