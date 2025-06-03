@@ -52,6 +52,10 @@ class articleManagementModel(dbSession):
             article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
             if not article:
                 raise HTTPException(status_code=404, detail="文章不存在")
+            # 删除文章前先删除所有该文章下的评论
+            from db import CommentInfo
+            self.session.query(CommentInfo).filter(CommentInfo.article_id == aid).delete()
+            # 删除文章
             self.session.delete(article)
             self.session.commit()
             return {"msg": "文章删除成功"}
@@ -162,6 +166,25 @@ class articleManagementModel(dbSession):
             ]
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"获取按点赞数排序的文章失败: {str(e)}")
+
+    # 根据用户名查询文章
+    def getArticlesByUserName(self, user_name: str):
+        try:
+            articles = self.session.query(ArticleInfo).filter(ArticleInfo.user_name == user_name).all()
+            return [
+                {
+                    "user_name": article.user_name,
+                    "article_id": article.article_id,
+                    "article_name": article.article_name,
+                    "article_content": article.article_content,
+                    "icon": article.icon,
+                    "picture": article.picture,
+                    "useful_num": article.useful_num,
+                    "publish_date": article.publish_date
+                } for article in articles
+            ]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"根据用户名查询文章失败: {str(e)}")
 
 
 

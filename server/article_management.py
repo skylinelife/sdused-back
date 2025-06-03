@@ -78,3 +78,11 @@ async def get_article_list_by_liked():
     db = articleManagementModel()
     res = db.getArticleListByLiked()
     return res
+
+
+# 根据用户名查询文章
+@router.get("/searchArticleByUserName")
+async def search_article_by_user_name(user_name: str):
+    db = articleManagementModel()
+    res = db.getArticlesByUserName(user_name)
+    return res

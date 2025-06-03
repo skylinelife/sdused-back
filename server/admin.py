@@ -11,9 +11,9 @@ router = APIRouter(
 
 # 获取所有用户信息（含状态）
 @router.get("/user/list")
-async def get_user_list(admin_name: adminType):
+async def get_user_list():
     db = adminModel()
-    res = db.getAllUsersInfo(admin_name)
+    res = db.getAllUsersInfo()
     return res
 
 
