@@ -124,10 +124,44 @@ class articleManagementModel(dbSession):
                 raise HTTPException(status_code=404, detail="文章不存在")
             article.useful_num += 1
             self.session.commit()
-            return {"msg": "点赞成功"}
+            return {"message": "点赞成功"}
         except Exception as e:
             self.session.rollback()
-            raise HTTPException(status_code=500, detail=f"点赞失败: {str(e)}")
+            return {"message": f"点赞失败{str(e)}"}
+
+    # 给一个文章取消点赞
+    def unlikeArticle(self, aid: int):
+        try:
+            article = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == aid).first()
+            if not article:
+                raise HTTPException(status_code=404, detail="文章不存在")
+            if article.useful_num > 0:
+                article.useful_num -= 1
+                self.session.commit()
+                return {"message": "取消点赞成功"}
+            else:
+                return {"message": "文章点赞数已为0，无需取消点赞"}
+        except Exception as e:
+            self.session.rollback()
+            return {"message": f"取消点赞失败{str(e)}"}
+
+    # 返回按点赞数降序排列的文章列表
+    def getArticleListByLiked(self):
+        try:
+            articles = self.session.query(ArticleInfo).order_by(ArticleInfo.useful_num.desc()).all()
+            return [
+                {
+                    "article_id": article.article_id,
+                    "user_name": article.user_name,
+                    "article_name": article.article_name,
+                    "icon": article.icon,
+                    "picture": article.picture,
+                    "useful_num": article.useful_num,
+                    "publish_date": article.publish_date
+                } for article in articles
+            ]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取按点赞数排序的文章失败: {str(e)}")
 
 
 

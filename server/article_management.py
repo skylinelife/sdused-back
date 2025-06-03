@@ -60,5 +60,21 @@ async def get_my_articles(user_name: str):
 @router.post("/like/{aid}")
 async def like_article(aid: int):
     db = articleManagementModel()
-    db.likeArticle(aid)
-    return makeResponse(None)
+    res = db.likeArticle(aid)
+    return makeResponse(res)
+
+
+# 给一个文章取消点赞
+@router.post("/unlike/{aid}")
+async def unlike_article(aid: int):
+    db = articleManagementModel()
+    res = db.unlikeArticle(aid)
+    return makeResponse(res)
+
+
+# 返回按点赞数降序排列的文章列表
+@router.get("/articleListByLiked")
+async def get_article_list_by_liked():
+    db = articleManagementModel()
+    res = db.getArticleListByLiked()
+    return res
