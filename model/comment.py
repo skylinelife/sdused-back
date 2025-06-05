@@ -31,6 +31,17 @@ class commentModel(dbSession):
             )
             self.session.add(new_comment)
             self.session.commit()
+            # 更新发布人发布的评论数量
+            user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
+            if user:
+                user.comment_num += 1
+                self.session.commit()
+            # 更新文章作者收到的评论数量
+            author = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == data.article_id).first()
+            if author:
+                user = self.session.query(UserInfo).filter(UserInfo.user_name == author.user_name).first()
+                user.commented_count += 1
+                self.session.commit()
             return {"msg": "评论添加成功", "comment_id": new_comment.comment_id}
         except Exception as e:
             self.session.rollback()
@@ -90,6 +101,18 @@ class commentModel(dbSession):
                 raise HTTPException(status_code=403, detail="没有权限删除该评论")
             self.session.delete(comment)
             self.session.commit()
+            # 更新发布人发布的评论数量
+            user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
+            if user:
+                user.comment_num -= 1
+                self.session.commit()
+            # 更新文章作者收到的评论数量
+
+            author = self.session.query(ArticleInfo).filter(ArticleInfo.article_id == comment.article_id).first()
+            if author:
+                user = self.session.query(UserInfo).filter(UserInfo.user_name == author.user_name).first()
+                user.commented_count -= 1
+                self.session.commit()
             return {"msg": "删除成功"}
         except Exception as e:
             self.session.rollback()

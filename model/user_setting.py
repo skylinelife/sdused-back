@@ -63,7 +63,8 @@ class userSettingModel(dbSession):
                     "article_num": data.article_num,
                     "comment_num": data.comment_num,
                     "commented_count": data.commented_count,
-                    "authority": data.authority
+                    "authority": data.authority,
+                    "email": data.email
                 }
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials")
