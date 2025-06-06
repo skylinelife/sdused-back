@@ -35,7 +35,6 @@ class setPasswordType(BaseModel):
 
 class updateUserType(BaseModel):
     user_name: str
-    password: str
-    sex: str
-    email: str
+    sex: str = None
+    email: str = None
     icon: Optional[str] = None

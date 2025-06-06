@@ -110,29 +110,24 @@ class userSettingModel(dbSession):
     def updateUserInfo(self, data: updateUserType):
         from datetime import datetime
         user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
-        signin = self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).first()
-        if user and signin:
+        if user:
             u_user = {
                 "user_name": data.user_name,
-                "sex": data.sex,
-                "email": data.email,
-                "icon": data.icon,
+                "sex": data.sex if data.sex else user.sex,
+                # 如果email为空，则不更新
+                "email": data.email if data.email else user.email,
+                "icon": data.icon if data.icon else user.icon,
                 "user_age": datetime.now()  # 更新用户使用时间为当前时间
             }
-            u_signin = {
-                "user_name": data.user_name,
-                "password": data.password
-            }
             self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).update(u_user)
-            self.session.query(SignInInfo).filter(SignInInfo.user_name == data.user_name).update(u_signin)
             self.session.commit()
             return \
                 {
                     "message": "User updated successfully.",
                     "user_name": data.user_name,
-                    "email": data.email,
-                    "password": data.password,
-                    "sex": data.sex
+                    "sex": data.sex if data.sex else user.sex,
+                    "email": data.email if data.email else user.email,
+                    "icon": data.icon if data.icon else user.icon,
                 }
         else:
             raise HTTPException(status_code=404, detail="User not found")
