@@ -131,3 +131,27 @@ class userSettingModel(dbSession):
                 }
         else:
             raise HTTPException(status_code=404, detail="User not found")
+
+    # 获取用户统计信息
+    def getUserState(self):
+        from db import UserInfo
+        from datetime import datetime, timedelta
+        total_users = self.session.query(UserInfo).count()
+        active_users_today = self.session.query(UserInfo).filter(
+            UserInfo.user_age >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        ).count()
+        active_users_this_week = self.session.query(UserInfo).filter(
+            UserInfo.user_age >= datetime.now() - timedelta(days=datetime.now().weekday())
+        ).count()
+        active_users_this_month = self.session.query(UserInfo).filter(
+            UserInfo.user_age >= datetime.now().replace(day=1)
+        ).count()
+
+        return {
+            "totalUsers": total_users,
+            "activeUsers": {
+                "dau": active_users_today,
+                "wau": active_users_this_week,
+                "mau": active_users_this_month
+            }
+        }

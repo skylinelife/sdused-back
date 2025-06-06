@@ -1,9 +1,10 @@
 from fastapi import HTTPException, UploadFile
 from fastapi import Response
+from sqlalchemy import func
 # from sqlalchemy import and_, func, delete
 from starlette.responses import StreamingResponse
 
-from db import dbSession, SignInInfo, UserInfo, ArticleInfo
+from db import dbSession, SignInInfo, UserInfo, ArticleInfo, CommentInfo
 from ser.article_management import createArticleType, updateArticleType, getArticleListType
 
 
@@ -185,6 +186,45 @@ class articleManagementModel(dbSession):
             ]
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"根据用户名查询文章失败: {str(e)}")
+
+    # 统计文章信息，包括总文章数、总评论数、总like数、每日新增文章数
+    def getArticleState(self):
+        try:
+            total_articles = self.session.query(ArticleInfo.article_id).count()
+            total_comments = self.session.query(CommentInfo.comment_id).count()  # 假设CommentInfo是评论表
+            total_likes = self.session.query(func.sum(ArticleInfo.useful_num)).scalar() or 0
+            # 计算每日新增文章数
+            from datetime import datetime, timedelta
+            today = datetime.now()
+            daily_new_articles = self.session.query(ArticleInfo).filter(
+                ArticleInfo.publish_date >= today - timedelta(days=1)
+            ).count()
+            return {
+                "totalArticles": total_articles,
+                "newArticlesToday": daily_new_articles,
+                "totalComments": total_comments,
+                "totalLikes": total_likes,  # 文章的总获赞数
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取文章统计信息失败: {str(e)}")
+
+    # 返回点赞量最高的5个article的id、title、点赞数
+    def getTopArticle(self):
+        try:
+            top_articles = self.session.query(
+                ArticleInfo.article_id,
+                ArticleInfo.article_name,
+                ArticleInfo.useful_num
+            ).order_by(ArticleInfo.useful_num.desc()).limit(5).all()
+            return [
+                {
+                    "article_id": article.article_id,
+                    "article_name": article.article_name,
+                    "useful_num": article.useful_num
+                } for article in top_articles
+            ]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"获取点赞量最高的文章失败: {str(e)}")
 
 
 

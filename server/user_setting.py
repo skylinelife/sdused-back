@@ -55,3 +55,11 @@ async def update_user_info(data: updateUserType):
     db = userSettingModel()
     res = db.updateUserInfo(data)
     return makeResponse(res)
+
+
+# 统计用户信息，包括totalUsers, 每日每周每月的activeUsers
+@router.get("/state")
+async def get_user_state():
+    db = userSettingModel()
+    res = db.getUserState()
+    return makeResponse(res)

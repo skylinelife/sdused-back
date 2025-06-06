@@ -86,3 +86,19 @@ async def search_article_by_user_name(user_name: str):
     db = articleManagementModel()
     res = db.getArticlesByUserName(user_name)
     return res
+
+
+# 统计文章信息，包括总文章数、总评论数、总like数、每日每周每月的新增文章数
+@router.get("/state")
+async def get_article_state():
+    db = articleManagementModel()
+    res = db.getArticleState()
+    return res
+
+
+# 返回点赞量最高的article的id、title、点赞数
+@router.get("/top")
+async def get_top_article():
+    db = articleManagementModel()
+    res = db.getTopArticle()
+    return res
