@@ -5,7 +5,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, DATETIME, LONGTEXT, \
-    FLOAT, BIGINT, TINYINT
+    FLOAT, BIGINT, TINYINT, MEDIUMTEXT
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 Base = declarative_base()
@@ -36,7 +36,7 @@ class UserInfo(Base):
     email = Column(VARCHAR(100), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(1000))
+    icon = Column(MEDIUMTEXT)
 
     # 文章数量，不允许为空
     article_num = Column(INTEGER, nullable=False)
@@ -65,7 +65,7 @@ class ArticleInfo(Base):
     user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(1000))
+    icon = Column(MEDIUMTEXT)
 
     # 文章名，唯一，不允许为空
     article_name = Column(VARCHAR(100), nullable=False, unique=True)
@@ -94,7 +94,7 @@ class CommentInfo(Base):
     user_name = Column(VARCHAR(100), ForeignKey("sign_in_info.user_name"), nullable=False)
 
     # 头像(存储图片名)
-    icon = Column(VARCHAR(1000))
+    icon = Column(MEDIUMTEXT)
 
     # 评论的文章id，外键，不允许为空
     article_id = Column(INTEGER, ForeignKey("article_info.article_id"), nullable=False)
@@ -123,7 +123,7 @@ class ManageData(Base):
     user_num = Column(INTEGER, nullable=False)
 
     # 头像数据
-    icon_data = Column(VARCHAR(1000))
+    icon_data = Column(MEDIUMTEXT)
 
     # 评论数，不允许为空
     comment_num = Column(INTEGER, nullable=False)

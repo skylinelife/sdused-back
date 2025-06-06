@@ -26,6 +26,10 @@ class articleManagementModel(dbSession):
             )
             self.session.add(new_article)
             self.session.commit()
+            # 更新用户的文章数量
+            user = self.session.query(UserInfo).filter(UserInfo.user_name == data.user_name).first()
+            user.article_num += 1
+            self.session.commit()
             return {"msg": "文章发布成功", "article_id": new_article.article_id}
         except Exception as e:
             self.session.rollback()
@@ -58,6 +62,10 @@ class articleManagementModel(dbSession):
             self.session.query(CommentInfo).filter(CommentInfo.article_id == aid).delete()
             # 删除文章
             self.session.delete(article)
+            self.session.commit()
+            # 更新用户的文章数量
+            user = self.session.query(UserInfo).filter(UserInfo.user_name == article.user_name).first()
+            user.article_num -= 1
             self.session.commit()
             return {"msg": "文章删除成功"}
         except Exception as e:
