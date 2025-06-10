@@ -138,14 +138,19 @@ class userSettingModel(dbSession):
         from db import UserInfo
         from datetime import datetime, timedelta
         total_users = self.session.query(UserInfo).count()
+        # 统计当天，最近七天和最近一个月的活跃用户数，以便返回
+        today = datetime.now()
+        start_of_today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        start_of_week = start_of_today - timedelta(days=start_of_today.weekday())
+        start_of_month = start_of_today.replace(day=1)
         active_users_today = self.session.query(UserInfo).filter(
-            UserInfo.user_age >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            UserInfo.user_age >= start_of_today
         ).count()
         active_users_this_week = self.session.query(UserInfo).filter(
-            UserInfo.user_age >= datetime.now() - timedelta(days=datetime.now().weekday())
+            UserInfo.user_age >= start_of_week
         ).count()
         active_users_this_month = self.session.query(UserInfo).filter(
-            UserInfo.user_age >= datetime.now().replace(day=1)
+            UserInfo.user_age >= start_of_month
         ).count()
 
         return {

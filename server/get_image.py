@@ -5,5 +5,5 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from utils import makeResponse
 
 router = APIRouter(
-    prefix="/image"
+    prefix="/api/image"
 )
